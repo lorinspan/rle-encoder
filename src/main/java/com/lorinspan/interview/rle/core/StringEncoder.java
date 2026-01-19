@@ -10,7 +10,7 @@ public interface StringEncoder {
      * @return the encoded string
      * @throws RleException if the encoding fails or input is invalid.
      */
-    String encode(String input) throws RleException;
+    String encodeString(String input) throws RleException;
 
     /**
      *
@@ -18,5 +18,5 @@ public interface StringEncoder {
      * @return the encoded string
      * @throws RleException if the encoding fails or input is invalid.
      */
-    String encode(char[] input) throws RleException;
+    String encodeCharArray(char[] input) throws RleException;
 }

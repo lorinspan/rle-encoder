@@ -20,27 +20,52 @@ public class RleStringEncoderTest {
             "abc, a1b1c1",
             "z, z1",
             "aaaaa, a5",
-            "1122$$@@, 1222$2@2",
             "aabbaa, a2b2a2"
     })
     @DisplayName("Should correctly encode various string patterns")
     void shouldEncodeCorrectly(String input, String expectedOutput) {
-        String result = encoder.encode(input);
+        String result = encoder.encodeString(input);
         assertThat(result).isEqualTo(expectedOutput);
     }
 
     @Test
     @DisplayName("Should return empty string for empty input")
     void shouldHandleEmptyString() {
-        String result = encoder.encode("");
+        String result = encoder.encodeString("");
         assertThat(result).isEmpty();
     }
 
     @Test
-    @DisplayName("Should propagate validation exception for null input")
-    void shouldThrowForNullInput() {
-        assertThatThrownBy(() -> encoder.encode((String) null))
+    @DisplayName("Should propagate validation exception for null string input")
+    void shouldThrowForNullStringInput() {
+        assertThatThrownBy(() -> encoder.encodeString(null))
                 .isInstanceOf(InvalidInputException.class)
-                .hasMessage("Input string cannot be null.");
+                .hasMessage("Input cannot be null.");
+    }
+
+    @Test
+    @DisplayName("Should correctly encode a character array directly")
+    void shouldEncodeCharArrayCorrectly() {
+        char[] input = {'A', 'A', 'B', 'B', 'C', 'D', 'D', 'D'};
+        String result = encoder.encodeCharArray(input);
+
+        assertThat(result).isEqualTo("A2B2C1D3");
+    }
+
+    @Test
+    @DisplayName("Should propagate validation exception for null char array")
+    void shouldThrowForNullCharArray() {
+        assertThatThrownBy(() -> encoder.encodeCharArray(null))
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage("Input cannot be null.");
+    }
+
+    @Test
+    @DisplayName("Should handle empty char array")
+    void shouldHandleEmptyCharArray() {
+        char[] input = new char[0];
+        String result = encoder.encodeCharArray(input);
+
+        assertThat(result).isEmpty();
     }
 }

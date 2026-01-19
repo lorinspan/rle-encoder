@@ -14,18 +14,18 @@ public class Main {
 
         System.out.println("=== RLE Encoder Demo ===\n");
 
-        System.out.println("--- Standard Scenarios ---");
+        System.out.println("--- Standard Scenarios (String) ---");
         List<String> testInputs = Arrays.asList("aaaabbbccc", "abbbcdddd", "abc", "");
         for (String input : testInputs) {
             process(encoder, input);
         }
 
-        System.out.println("\n--- Requirement Scenario ---");
+        System.out.println("\n--- Standard Scenario (Char Array) ---");
         process(encoder, new char[]{'A', 'A', 'B', 'B', 'C', 'D', 'D', 'D'});
 
         System.out.println("\n--- Edge & Security Scenarios ---");
         process(encoder, (String) null);
-        process(encoder, "A".repeat(999_999));
+        process(encoder, "A".repeat(1_000_000).toCharArray());
         process(encoder, "A".repeat(1_000_001));
     }
 
@@ -33,24 +33,45 @@ public class Main {
         String formattedInput = format(input);
         try {
             long start = System.nanoTime();
-            String result = encoder.encode(input);
+
+            String result = encoder.encodeString(input);
+
             long durationNs = System.nanoTime() - start;
-
-            String timeDisplay = (durationNs > 1_000_000)
-                    ? (durationNs / 1_000_000) + " ms"
-                    : durationNs + " ns";
-
-            System.out.printf("Input: %-25s | Output: %-25s | Time: %s%n",
-                    formattedInput, format(result), timeDisplay);
+            printResult(formattedInput, result, durationNs);
 
         } catch (RleException exception) {
-            System.err.printf("Input: %-25s | Failed: %s%n", formattedInput, exception.getMessage());
-            try { Thread.sleep(10); } catch (InterruptedException ignored) {}
+            printError(formattedInput, exception);
         }
     }
 
     private static void process(StringEncoder encoder, char[] input) {
-        process(encoder, input == null ? null : new String(input));
+        String formattedInput = input == null ? "[NULL]" : format(new String(input));
+
+        try {
+            long start = System.nanoTime();
+
+            String result = encoder.encodeCharArray(input);
+
+            long durationNs = System.nanoTime() - start;
+            printResult(formattedInput, result, durationNs);
+
+        } catch (RleException exception) {
+            printError(formattedInput, exception);
+        }
+    }
+
+    private static void printResult(String input, String output, long durationNs) {
+        String timeDisplay = (durationNs > 1_000_000)
+                ? (durationNs / 1_000_000) + " ms"
+                : durationNs + " ns";
+
+        System.out.printf("Input: %-25s | Output: %-25s | Time: %s%n",
+                input, format(output), timeDisplay);
+    }
+
+    private static void printError(String input, Exception exception) {
+        System.err.printf("Input: %-25s | Failed: %s%n", input, exception.getMessage());
+        try { Thread.sleep(10); } catch (InterruptedException ignored) {}
     }
 
     private static String format(String input) {

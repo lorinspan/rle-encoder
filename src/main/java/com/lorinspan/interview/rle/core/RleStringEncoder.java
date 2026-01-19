@@ -16,41 +16,42 @@ public class RleStringEncoder implements StringEncoder {
     }
 
     @Override
-    public String encode(String input) throws RleException {
+    public String encodeString(String input) throws RleException {
         validator.validate(input);
 
-        if (input.isEmpty()) {
+        return encode(input.toCharArray());
+    }
+
+    @Override
+    public String encodeCharArray(char[] input) throws RleException {
+        validator.validate(input);
+
+        return encode(input);
+    }
+
+    private String encode(char[] chars) {
+        if (chars.length == 0) {
             return "";
         }
 
-        StringBuilder result = new StringBuilder(input.length());
+        StringBuilder result = new StringBuilder(chars.length);
 
-        char currentChar = input.charAt(0);
+        char currentChar = chars[0];
         int count = 1;
 
-        for (int i = 1; i < input.length(); ++i) {
-            char nextChar = input.charAt(i);
+        for (int i = 1; i < chars.length; i++) {
+            char nextChar = chars[i];
 
             if (nextChar == currentChar) {
                 count++;
             } else {
                 result.append(currentChar).append(count);
-
                 currentChar = nextChar;
                 count = 1;
             }
         }
 
         result.append(currentChar).append(count);
-
         return result.toString();
-    }
-
-    @Override
-    public String encode(char[] input) throws RleException {
-        if (input == null) {
-            return encode((String) null);
-        }
-        return encode(new String(input));
     }
 }
